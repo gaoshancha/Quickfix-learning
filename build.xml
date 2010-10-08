@@ -1,0 +1,63 @@
+<project name="QuickfixLearning" default="jar" basedir=".">
+
+  <description>
+    Ant build file for a Quickfix demo application
+  </description>
+
+  <!-- Global properties: set paths here and use vars in case of changes in the future-->
+  <property name="src" location="./src"/>
+  <property name="lib" location="./lib"/>
+  <property name="bin" location="./bin"/>
+  <property name="etc" location="./etc"/>
+
+  <path id="project.class.path">
+    <!-- QuickfixJ libraries -->
+    <pathelement location="../quickfixj/quickfixj-all-1.4.0.jar"/>
+    <pathelement location="../quickfixj/lib/slf4j-api-1.5.3.jar"/>
+    <pathelement location="../quickfixj/lib/slf4j-jdk14-1.5.3.jar"/>
+    <pathelement location="../quickfixj/lib/mina-core-1.1.0.jar"/>
+    <!-- Project directory-->
+    <pathelement location="${lib}"/>
+  </path>
+
+  <target name="compile">
+    <javac srcdir="${src}" destdir="${lib}">
+      <classpath refid="project.class.path"/>
+    </javac>
+  </target>
+
+  <target name="jar" depends="compile">
+    <jar destfile="${bin}/LanFongOMS.jar" includes="${lib}/*.class">
+      <manifest>
+        <attribute name="Main-Class" value="LanFongOMS"/>
+      </manifest>
+    </jar>
+    <jar destfile="${bin}/BakerStreetOMS.jar" includes="${lib}/*.class">
+      <manifest>
+        <attribute name="Main-Class" value="BakerStreetOMS"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <target name="run_broker" depends="jar">
+    <java classname="LanFongOMS" fork="true">
+      <classpath refid="project.class.path"/>
+      <arg value="${etc}/lanfong.cfg"/>
+    </java>
+  </target>
+
+  <target name="run_client" depends="jar">
+    <java classname="BakerStreetOMS" fork="true">
+      <classpath refid="project.class.path"/>
+      <arg value="${etc}/bakerstreet.cfg"/>
+    </java>
+  </target>
+
+  <target name="clean">
+    <delete>
+      <fileset dir="${lib}" includes="*.class"/>
+      <fileset dir="${bin}" includes="*.jar"/>
+    </delete>
+  </target>
+
+</project>
